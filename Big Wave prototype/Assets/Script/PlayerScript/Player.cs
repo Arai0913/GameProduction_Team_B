@@ -9,13 +9,14 @@ public class Player : MonoBehaviour
     public float hpMax = 100;//最大体力
     public float trick = 0;//現在のトリックゲージ
     public float trickMax = 50;//最大トリックゲージ
-    public Gamepad gamepad = Gamepad.current;
+    SceneControlManager sceneControlManager;
 
     // Start is called before the first frame update
     void Start()
     {
         hp = hpMax;//ステータス初期化
         trick = 0;
+        sceneControlManager = GameObject.FindWithTag("SceneManager").GetComponent<SceneControlManager>();
     }
 
     // Update is called once per frame
@@ -24,6 +25,8 @@ public class Player : MonoBehaviour
         LimitHP();//体力が限界突破しないように
 
         LimitTRICK();//トリックが限界突破しないように
+
+        Dead();//敵プレイヤー死亡時ゲームオーバーシーンに移行
     }
 
     public void Damage(float a)//プレイヤーにダメージを与える(aの値分与える)
@@ -36,7 +39,7 @@ public class Player : MonoBehaviour
         trick+=a;
     }
 
-    public void ConsumeTRICK(float a)//トリックを0にする
+    public void ConsumeTRICK(float a)//トリックをa分消費する
     {
         trick -= a;
     }
@@ -56,22 +59,30 @@ public class Player : MonoBehaviour
             trick = trickMax;
         }
     }
-    public void AttackVibration(float a)//攻撃の強さに合わせて振動を強くする
-    {
-        if (gamepad != null)
-        { 
 
-            gamepad.SetMotorSpeeds(a,a);
+    void Dead()//敵プレイヤー死亡時ゲームオーバーシーンに移行
+    {
+        if(hp<=0)
+        {
+            sceneControlManager.ChangeGameoverScene();
         }
     }
-    public void StopVibration()
-    {
-        if (gamepad != null)
-        { 
+    //public void AttackVibration(float a)//攻撃の強さに合わせて振動を強くする
+    //{
+    //    if (gamepad != null)
+    //    { 
 
-            gamepad.SetMotorSpeeds(0,0);
-        }
-    }
+    //        gamepad.SetMotorSpeeds(a,a);
+    //    }
+    //}
+    //public void StopVibration()
+    //{
+    //    if (gamepad != null)
+    //    { 
+
+    //        gamepad.SetMotorSpeeds(0,0);
+    //    }
+    //}
 
 
 
