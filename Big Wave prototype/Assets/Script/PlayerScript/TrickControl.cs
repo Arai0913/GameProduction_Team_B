@@ -57,6 +57,7 @@ public class TrickControl : MonoBehaviour
     [SerializeField] bool chargeTrickBuff=false;//チャージトリック量増加のバフ
     //[SerializeField] float trick_DamageFactor = 0.5f;//トリックをためた時のダメージの上昇具合、1、２、3、nだとそれぞれトリック満タン時、トリック空っぽの時のダメージの2、3、4、(1+1*n)倍になる
     private bool tricked;//トリックしたかしていないかの判定
+    private int trickCount=0;//一回のジャンプにしたトリックの回数
 
     AudioSource audioSource;//プレイヤーから音を出す為の処置。
     Enemy enemy;
@@ -64,6 +65,8 @@ public class TrickControl : MonoBehaviour
     JumpControl jumpcontrol;
     BuffOfPlayer buffOfPlayer;
     Controller controller;
+    ManagementOfScore managementOfScore;
+    ProcessFeverPoint processFeverPoint;
    
     
     public bool Tricked
@@ -78,6 +81,7 @@ public class TrickControl : MonoBehaviour
         healTrick.TrickPattern = TrickType.heal;
         buffTrick.TrickPattern = TrickType.buff;
         tricked = false;
+        trickCount = 0;
         enemy = GameObject.FindWithTag("Enemy").GetComponent<Enemy>();
         player = gameObject.GetComponent<Player>();
         jumpcontrol = gameObject.GetComponent<JumpControl>();
@@ -86,12 +90,20 @@ public class TrickControl : MonoBehaviour
         //☆福島君が書いた
         audioSource = GetComponent<AudioSource>();
         //
+        managementOfScore = GameObject.FindWithTag("ScoreManager").GetComponent<ManagementOfScore>();
+        processFeverPoint= gameObject.GetComponent<ProcessFeverPoint>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        ResetTrickCount();
         TrickedtoFalseNoJump();//ジャンプしていない時攻撃していない判定にする
+    }
+
+    float Damage()//敵に与えるダメージ合計
+    {
+        return damageAmount * buffOfPlayer.PowerUp.CurrentGrowthRate * processFeverPoint.CurrentPowerUp_GrowthRate;
     }
 
     //攻撃
@@ -102,9 +114,8 @@ public class TrickControl : MonoBehaviour
             switch (trick.TrickPattern)
             {
                 case TrickType.attack://敵にダメージを与える
-                    //トリックがたまっているときほどダメージが上昇するようになっている
-                    //enemy.Hp -= strength_Damage * (1 + trickPercentage * trick_DamageFactor);
-                    enemy.Hp -= damageAmount * buffOfPlayer.PowerUp.CurrentGrowthRate;
+                    
+                    enemy.Hp -= Damage();
                     break;
                 case TrickType.heal://プレイヤーの体力を回復する
                     player.Hp += healAmount;
@@ -112,11 +123,11 @@ public class TrickControl : MonoBehaviour
                 case TrickType.buff://プレイヤーにバフをかける
                     if (powerUpBuff)
                     {
-                        buffOfPlayer.PowerUpBuff();
+                        buffOfPlayer.PowerUp.Activate();
                     }
                     if (chargeTrickBuff)
                     {
-                        buffOfPlayer.ChargeTrickBuff();
+                        buffOfPlayer.ChargeTrick.Activate();
                     }
                     break;
             }
@@ -127,31 +138,39 @@ public class TrickControl : MonoBehaviour
             //☆福島君が書いた
             audioSource.PlayOneShot(trick.TrickSound);//効果音の再生
             //
+            managementOfScore.AddTrickScore();//トリック成功によるスコアの加点
+            trickCount++;//1回トリックした(1ジャンプ中に)
+            processFeverPoint.ChargeFeverPoint(trickCount);
         }
     }
 
-    //強攻撃(ジャンプ中にJキーかXボタンを入力)
-    //消費トリックはプレイヤーの最大トリックのstrong_TrickCostPercent%分消費
+    //バフのトリック(ジャンプ中にJキーかXボタンを入力)
     public void Trick_Buff()
     {
         Trick(buffTrick);
     }
 
-    //中攻撃(ジャンプ中にKキーかBボタンを入力)
+    //攻撃のトリック(ジャンプ中にKキーかBボタンを入力)
     //消費トリックはプレイヤーの最大トリックのstrong_TrickCostPercent%分消費
     public void Trick_attack()
     {
         Trick(attackTrick);
     }
 
-    //弱攻撃(ジャンプ中にLキーかAボタンを入力)
+    //回復のトリック(ジャンプ中にLキーかAボタンを入力)
     //消費トリックはプレイヤーの最大トリックのstrong_TrickCostPercent%分消費
     public void Trick_Heal()
     {
         Trick(healTrick);
     }
 
-
+    void ResetTrickCount()
+    {
+        if (jumpcontrol.JumpNow == false)//着地したら1ジャンプ中のトリック回数をリセット
+        {
+            trickCount = 0;
+        }
+    }
 
     //☆桑原君が書いた
     //ジャンプしていない時攻撃していない判定にする
