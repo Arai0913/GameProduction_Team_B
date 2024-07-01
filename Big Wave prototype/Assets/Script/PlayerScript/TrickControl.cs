@@ -47,17 +47,25 @@ public class TrickControl : MonoBehaviour
     [SerializeField] Trick healTrick;//回復のトリック
     [Header("バフのトリック")]
     [SerializeField] Trick buffTrick;//バフのトリック
-    [Header("敵に与えるダメージ")]
-    [SerializeField] float damageAmount = 100;//敵に与えるダメージ
+    [Header("通常時の敵に与えるダメージ")]
+    [SerializeField] float damageAmount = 100;//通常時の敵に与えるダメージ
     [Header("HPの回復量")]
     [SerializeField] float healAmount = 50;//HPの回復量
-    [Header("攻撃力増加のバフ")]
+    /*[Header("攻撃力増加のバフ")]
     [SerializeField] bool powerUpBuff=false;//攻撃力増加のバフ
     [Header("チャージトリック量増加のバフ")]
-    [SerializeField] bool chargeTrickBuff=false;//チャージトリック量増加のバフ
+    [SerializeField] bool chargeTrickBuff=false;//チャージトリック量増加のバフ*/
+    [Header("トリック強化のバフ")]
+    [SerializeField] bool trickBoostBuff = false;//トリック強化のバフ
     //[SerializeField] float trick_DamageFactor = 0.5f;//トリックをためた時のダメージの上昇具合、1、２、3、nだとそれぞれトリック満タン時、トリック空っぽの時のダメージの2、3、4、(1+1*n)倍になる
+    [Header("トリック使用時の滞空時間")]
+    [SerializeField] float hoverTime = 0.2f;//トリック使用時の滞空時間
+    [Header("滞空終了時に起こるジャンプの強さ")]
+    [SerializeField] float hoverJumpStrength = 2f;//滞空終了時に起こるジャンプの強さ
     private bool tricked;//トリックしたかしていないかの判定
     private int trickCount=0;//一回のジャンプにしたトリックの回数
+    private bool consumedTrickPoint;//トリックゲージを消費したかどうかの判定
+    private Coroutine HoverCoroutine;
 
     AudioSource audioSource;//プレイヤーから音を出す為の処置。
     Enemy enemy;
@@ -66,7 +74,7 @@ public class TrickControl : MonoBehaviour
     BuffOfPlayer buffOfPlayer;
     Controller controller;
     ManagementOfScore managementOfScore;
-    ProcessFeverPoint processFeverPoint;
+    ProcessFeverMode processFeverPoint;
    
     
     public bool Tricked
@@ -82,6 +90,7 @@ public class TrickControl : MonoBehaviour
         buffTrick.TrickPattern = TrickType.buff;
         tricked = false;
         trickCount = 0;
+
         enemy = GameObject.FindWithTag("Enemy").GetComponent<Enemy>();
         player = gameObject.GetComponent<Player>();
         jumpcontrol = gameObject.GetComponent<JumpControl>();
@@ -91,7 +100,7 @@ public class TrickControl : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
         //
         managementOfScore = GameObject.FindWithTag("ScoreManager").GetComponent<ManagementOfScore>();
-        processFeverPoint= gameObject.GetComponent<ProcessFeverPoint>();
+        processFeverPoint= gameObject.GetComponent<ProcessFeverMode>();
     }
 
     // Update is called once per frame
@@ -103,44 +112,77 @@ public class TrickControl : MonoBehaviour
 
     float Damage()//敵に与えるダメージ合計
     {
-        return damageAmount * buffOfPlayer.PowerUp.CurrentGrowthRate * processFeverPoint.CurrentPowerUp_GrowthRate;
+        //return damageAmount * buffOfPlayer.PowerUp.CurrentGrowthRate * processFeverPoint.CurrentPowerUp_GrowthRate;
+        return damageAmount* buffOfPlayer.TrickBoost.CurrentGrowthRate * processFeverPoint.CurrentPowerUp_GrowthRate;
     }
 
-    //攻撃
+    float Heal()
+    {
+        return healAmount * buffOfPlayer.TrickBoost.CurrentGrowthRate;
+    }
+
+
+    //トリック
     void Trick(Trick trick)
     {
-        if (jumpcontrol.JumpNow == true && player.ConsumeCharge(trick.TrickCost) && enemy != null)//ジャンプしている＆消費トリックが足りる(ここでトリック消費の処理をする)＆敵がいる時のみ攻撃可能
+        if (jumpcontrol.JumpNow == true && /*player.ConsumeTrickPoint(trick.TrickCost) &&*/ enemy != null)//ジャンプしている＆消費トリックが足りる(ここでトリック消費の処理をする)＆敵がいる時のみ攻撃可能
         {
-            switch (trick.TrickPattern)
+            consumedTrickPoint = false;
+
+            if(trick.TrickPattern == TrickType.buff
+                && buffOfPlayer.TrickBoost.BuffStockCount >= buffOfPlayer.TrickBoost.BuffStockMax)
+            //バフのトリックが行われ、かつバフのストックが最大数たまっているなら
             {
-                case TrickType.attack://敵にダメージを与える
-                    
-                    enemy.Hp -= Damage();
-                    break;
-                case TrickType.heal://プレイヤーの体力を回復する
-                    player.Hp += healAmount;
-                    break;
-                case TrickType.buff://プレイヤーにバフをかける
-                    if (powerUpBuff)
-                    {
-                        buffOfPlayer.PowerUp.Activate();
-                    }
-                    if (chargeTrickBuff)
-                    {
-                        buffOfPlayer.ChargeTrick.Activate();
-                    }
-                    break;
+                return;//トリックの処理を行わない
             }
 
-            //全てのトリックの共通処理
-            tricked = true;//トリックした
-            controller.Vibe_Trick();//バイブさせる
-            //☆福島君が書いた
-            audioSource.PlayOneShot(trick.TrickSound);//効果音の再生
-            //
-            managementOfScore.AddTrickScore();//トリック成功によるスコアの加点
-            trickCount++;//1回トリックした(1ジャンプ中に)
-            processFeverPoint.ChargeFeverPoint(trickCount);
+            if (player.ConsumeTrickPoint(trick.TrickCost))
+            {
+                consumedTrickPoint = true;
+
+                switch (trick.TrickPattern)
+                {
+                    case TrickType.attack://敵にダメージを与える
+                        buffOfPlayer.TrickBoost.DecrementBuffStock();
+                        enemy.Hp -= Damage();
+                        break;
+                    case TrickType.heal://プレイヤーの体力を回復する
+                        buffOfPlayer.TrickBoost.DecrementBuffStock();
+                        //player.Hp += healAmount;
+                        player.Hp += Heal();
+                        break;
+                    case TrickType.buff://プレイヤーにバフをかける
+                        /*if (powerUpBuff)
+                        {
+                            buffOfPlayer.PowerUp.Activate();
+                        }
+                        if (chargeTrickBuff)
+                        {
+                            buffOfPlayer.ChargeTrick.Activate();
+                        }*/
+
+                        if(trickBoostBuff)
+                        {
+                            buffOfPlayer.TrickBoost.IncreaseBuffStock();//バフストック数の増加
+                            buffOfPlayer.TrickBoost.Activate();
+                        }
+                        break;
+                }
+            }
+
+            if (consumedTrickPoint)
+            {
+                //全てのトリックの共通処理
+                tricked = true;//トリックした
+                controller.Vibe_Trick();//バイブさせる
+                                        //☆福島君が書いた
+                audioSource.PlayOneShot(trick.TrickSound);//効果音の再生
+                                                          //
+                managementOfScore.AddTrickScore();//トリック成功によるスコアの加点
+                trickCount++;//1回トリックした(1ジャンプ中に)
+                processFeverPoint.ChargeFeverPoint(trickCount);
+                HoverCoroutine = StartCoroutine(HoverJump());
+            }
         }
     }
 
@@ -180,5 +222,15 @@ public class TrickControl : MonoBehaviour
         {
             tricked = false;//攻撃していない
         }
+    }
+    IEnumerator HoverJump()
+    {
+        jumpcontrol.rb.useGravity = false;
+        jumpcontrol.rb.velocity = Vector3.zero;//重力とジャンプの運動を一時的に止める
+
+        yield return new WaitForSeconds(hoverTime);
+
+        jumpcontrol.rb.useGravity = true;
+        jumpcontrol.rb.velocity= new(0, hoverJumpStrength, 0);
     }
 }
