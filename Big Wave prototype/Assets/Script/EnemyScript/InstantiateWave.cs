@@ -4,15 +4,16 @@ using UnityEngine;
 
 public class InstantiateWave : MonoBehaviour
 {
-    //™‰–‚ª‘‚¢‚½
+    //™ì¬Ò:™R
+    [Header("”g‚Ì¶¬ˆÊ’u")]
     [SerializeField] GameObject instantiateWavePos;//”g‚Ì¶¬ˆÊ’u
-    [SerializeField] GameObject outSideWave;//ŠO‘¤‚Ì”g‚ÌƒvƒŒƒnƒu
-    [SerializeField] GameObject inSideWave;//“à‘¤(’†‰›)‚Ì”g‚ÌƒvƒŒƒnƒu
-    [SerializeField] float outSideWaveIntervalTime = 0.1f;//ŠO‘¤‚Ì”g‚ÌoŒ»ŠÔŠu
-    [SerializeField] float inSideWaveIntervalTime = 0.1f;//“à‘¤‚Ì”g‚ÌoŒ»ŠÔŠu
-    private float outSideWaveTime = 0f;//ŠO‘¤‚Ì”g‚ÌoŒ»ŠÔŠu‚ğŠÇ—‚·‚éŠÔ
-    private float inSideWaveTime = 0f;//“à‘¤(’†‰›)‚Ì”g‚ÌoŒ»ŠÔŠu‚ğŠÇ—‚·‚éŠÔ
-    private Vector3 inSideWavePos;//“à‘¤‚Ì”g‚Ì¶¬ˆÊ’uAinstantiateWavePos‚æ‚è‚à­‚µ‚‚¢yÀ•W‚Å¶¬‚·‚é
+    [Header("”g‚ÌƒvƒŒƒnƒu")]
+    [SerializeField] GameObject wavePrefab;//”g‚ÌƒvƒŒƒnƒu
+    [Header("”g‚ÌoŒ»ŠÔŠu")]
+    [SerializeField] float waveIntervalTime = 0.1f;//”g‚ÌoŒ»ŠÔŠu
+    [Header("GamePos")]
+    [SerializeField] GameObject gamePos;//GamePos
+    private float waveTime = 0f;//”g‚ÌoŒ»ŠÔŠu‚ğŠÇ—‚·‚éŠÔ
     // Start is called before the first frame update
     void Start()
     {
@@ -22,33 +23,19 @@ public class InstantiateWave : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        InstantiateOutSideWave();//ŠO‘¤‚Ì”g‚Ì¶¬   
-        InstantiateInSideWave();//“à‘¤(’†‰›)‚Ì”g‚Ì¶¬
+        InstantiateWavePrefab();//”g‚Ì¶¬
     }
 
-    //ŠO‘¤‚Ì”g‚Ì¶¬
-    //outSideWaveIntervalTime‚ÌŠÔ‚²‚Æ‚É”g‚ğ¶¬‚·‚é
-    void InstantiateOutSideWave()
+    //”g‚Ì¶¬AwaveIntervalTime‚ÌŠÔ‚²‚Æ‚É”g‚ğ¶¬‚·‚é
+    void InstantiateWavePrefab()
     {
-        outSideWaveTime += Time.deltaTime;
-        if (outSideWaveTime > outSideWaveIntervalTime)
-        {
-            outSideWaveTime = 0f;
-            Instantiate(outSideWave, instantiateWavePos.transform.position, transform.rotation);
-        }
-    }
+        waveTime += Time.deltaTime;//”g‚ÌoŒ»ŠÔŠu‚ğŠÇ—‚·‚éŠÔ‚ğXV
 
-    //“à‘¤(’†‰›)‚Ì”g‚Ì¶¬
-    //inSideWaveIntervalTime‚ÌŠÔ‚²‚Æ‚É”g‚ğ¶¬‚·‚é
-    void InstantiateInSideWave()
-    {
-        inSideWavePos = instantiateWavePos.transform.position;
-        inSideWavePos.y += 0.1f;//instantiateWavePos‚æ‚è‚à­‚µ‚‚¢yÀ•W‚Å¶¬‚·‚é
-        inSideWaveTime += Time.deltaTime;
-        if (inSideWaveTime > inSideWaveIntervalTime)
+        if (waveTime>waveIntervalTime)
         {
-            inSideWaveTime = 0f;
-            Instantiate(inSideWave, inSideWavePos, transform.rotation);
+            waveTime = 0f;//”g‚ÌoŒ»ŠÔŠu‚ğŠÇ—‚·‚éŠÔ‚ğƒŠƒZƒbƒg
+            GameObject wave = Instantiate(wavePrefab, instantiateWavePos.transform.position, transform.rotation, gamePos.transform);//”g‚ğ¶¬
+            wave.transform.rotation = Quaternion.Euler(0, 180, 0);//”g‚ğŒã‚ëŒü‚«(ƒvƒŒƒCƒ„[•ûŒü)‚É‚·‚é
         }
     }
 }
