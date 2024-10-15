@@ -9,10 +9,10 @@ public class PushedButton_CurrentTrickPattern : MonoBehaviour
 {
     [Header("設定したいトリックパターン")]
     [Tooltip("設定したいトリックパターンはボタンの種類の数の分だけ設定してください")]
-    [SerializeField] TrickPatternTypeBase[] trickPatterns;//設定したいトリックパターン
-    TrickPatternTypeBase currentTrickPattern;//現在のトリックパターン
+    [SerializeField] TrickPatternEffect[] trickPatterns;//設定したいトリックパターン
+    TrickPatternEffect currentTrickPattern;//現在のトリックパターン
 
-    public Button PushedButton//押されたボタンを返す
+    public TrickButton PushedButton//押されたボタンを返す
     {
         get { return currentTrickPattern.Button; }
     }
@@ -28,7 +28,7 @@ public class PushedButton_CurrentTrickPattern : MonoBehaviour
     }
 
 
-    public void SetTrickPattern(Button button)//受け取ったボタンの種類に応じて現在のトリックパターンを設定(割り当てる)
+    public void SetTrickPattern(TrickButton button)//受け取ったボタンの種類に応じて現在のトリックパターンを設定(割り当てる)
     {
         for(int i=0; i< trickPatterns.Length; i++)
         {
