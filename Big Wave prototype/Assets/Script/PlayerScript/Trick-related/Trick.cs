@@ -26,7 +26,7 @@ public partial class Trick : MonoBehaviour
     
     void Start()
     {
-        enemy_Hp = GameObject.FindWithTag("Enemy").GetComponent<HP>();
+        enemy_Hp = GameObject.FindWithTag("Enemy").GetComponentInChildren<HP>();
     }
 
     //トリック発動
@@ -39,11 +39,12 @@ public partial class Trick : MonoBehaviour
             critical.SetCriticalNow();//押されたボタンからクリティカルの判定
             countTrickWhileJump.AddTrickCount();//ジャンプ中のトリック回数の加算
             countTrickCombo.Count();//トリックコンボ回数の加算
+
             eventsWhenTrick.Invoke();//登録された全イベントを呼ぶ
         }
     }
 
-    bool JudgeSuccessOfTrick()//トリック成功かの判定(成功であればtrueを返す)
+     bool JudgeSuccessOfTrick()//トリック成功かの判定(成功であればtrueを返す)
     {
         int trickCost = pushedButton_TrickPattern.TrickCost;//トリック消費量、押されたボタンに対応したトリックパターンのトリック消費量
 
