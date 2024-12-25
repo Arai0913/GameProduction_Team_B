@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -2187,7 +2187,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -17.6, y: 340.92}
+  m_AnchoredPosition: {x: 0.1, y: 434}
   m_SizeDelta: {x: 239.58, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &821380366
@@ -2587,6 +2587,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cc018ec2e0a1804aa383e090389df5e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _stageDataList: {fileID: 11400000, guid: 80351eab2243e5a459e72385f2c7f07d, type: 2}
 --- !u!1 &1245759030
 GameObject:
   m_ObjectHideFlags: 0
@@ -3130,15 +3131,15 @@ RectTransform:
   m_GameObject: {fileID: 1493002336}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1960656598}
-  m_Father: {fileID: 1756324136}
+  m_Father: {fileID: 1548141158}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 596.0801, y: -100}
+  m_AnchoredPosition: {x: 298.04004, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1509253547
@@ -3247,11 +3248,12 @@ RectTransform:
   - {fileID: 1967409839}
   - {fileID: 101829442}
   - {fileID: 2015011579}
+  - {fileID: 1493002337}
   m_Father: {fileID: 1756324136}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 103.3}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1561089437
@@ -3299,10 +3301,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isFadeOut: 1
-  _selectScene:
-    _scene: 3
-    _gameSceneStageID: 0
-    _sceneController: {fileID: 1112961327}
+  _clickEvents:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1112961327}
+        m_TargetAssemblyTypeName: SceneController, Assembly-CSharp
+        m_MethodName: RetryGameScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   menuEffectController: {fileID: 1756324138}
   fadeOut: {fileID: 1756324137}
 --- !u!1 &1608975630
@@ -3791,7 +3804,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -10.61, y: -339.2}
+  m_AnchoredPosition: {x: -10.61, y: -294}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1642325571
@@ -4250,7 +4263,6 @@ RectTransform:
   - {fileID: 1642325569}
   - {fileID: 1548141158}
   - {fileID: 542408703}
-  - {fileID: 1493002337}
   - {fileID: 204220287}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4326,7 +4338,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -10.61, y: -208.7}
+  m_AnchoredPosition: {x: -10.61, y: -167.13}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1774953350
@@ -4593,10 +4605,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isFadeOut: 0
-  _selectScene:
-    _scene: 0
-    _gameSceneStageID: 0
-    _sceneController: {fileID: 1112961327}
+  _clickEvents:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1112961327}
+        m_TargetAssemblyTypeName: SceneController, Assembly-CSharp
+        m_MethodName: StageSelectScene
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   menuEffectController: {fileID: 1756324138}
   fadeOut: {fileID: 1756324137}
 --- !u!1 &1817854062

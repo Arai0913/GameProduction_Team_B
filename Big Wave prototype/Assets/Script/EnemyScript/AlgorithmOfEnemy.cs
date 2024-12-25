@@ -13,13 +13,6 @@ public class AlgorithmOfEnemy : MonoBehaviour
     private float currentActionTime = 0;//現在の行動時間
     private float actionTime;//行動時間、現在の行動時間(currentActionTime)がこれ以上になったら行動を変更する
     private ActionPattern currentActionPattern;//現在の行動パターン
-    bool _switch = false;//これがfalseになっている時は行動しない、trueの時は行動する
-
-    public bool Switch
-    {
-        get { return _switch; }
-        set { _switch = value; }
-    }
 
     void Start()
     {
@@ -33,8 +26,6 @@ public class AlgorithmOfEnemy : MonoBehaviour
 
     void Algorithm()//行動アルゴリズムの処理
     {
-        if (!_switch) return;//まだゲーム開始されてなかったら波を生成しない
-
         currentActionTime += Time.deltaTime;
 
         bool actionNow = (currentActionTime < actionTime);//現在行動しているか
