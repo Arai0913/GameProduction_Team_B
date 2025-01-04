@@ -61,6 +61,4 @@ public class RepetitiveValue_Sin
     {
         _time += Time.deltaTime;
     }
-
-
 }
